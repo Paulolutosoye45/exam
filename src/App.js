@@ -6,6 +6,7 @@ import'./App.css'
 const API_URL = "https://opentdb.com/api.php?amount=10&category=18&difficulty=easy&type=multiple";
 
 function App() {
+  
 
   const [questions, setQuestions] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
