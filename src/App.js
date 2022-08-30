@@ -1,47 +1,65 @@
-import './App.css';
-import useFetch from './components/useFetch';
+import Axios from 'axios';
+import React, {useState, useEffect} from 'react';
+import Questionaire from './components/Questionaire';
+import'./App.css'
 
-
-
-
+const API_URL = "https://opentdb.com/api.php?amount=10&category=18&difficulty=easy&type=multiple";
 
 function App() {
-  const { data, loading, error, refetch } = useFetch(
-    "https://opentdb.com/api.php?amount=30"
-  );
 
-  if (loading) return <h1> LOADING...</h1>;
+  const [questions, setQuestions] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [score, setScore] = useState(0);
+  const [showAnswers, setShowAnswers] = useState(false);
 
-  if (error) console.log(error);
-  console.log(data)
-  return (
-    <div className="App">
-      <div className='quiz-container'>
-      <div className= "quiz-head">
-                    <h1 className="quiz-title">Quiz Game</h1>
-                    <div className= "quiz-score flex">
-                        <span id = "correct-score"></span>/<span id = "total-question"></span>
-                    </div>
-                </div>
+  useEffect(() =>{
+    Axios.get(API_URL)
+      .then(res => res.data)
+      .then(data => {
+        const questions = data.results.map((question) => ({
+          ...question,
+          answers:[question.correct_answer, ...question.incorrect_answers].sort(() => Math.random() - 0.5)
+        }))
+        setQuestions(questions)
+      });
+  },[])
 
-      <div className='quiz-body'>
-                 <h2 className= 'quiz-question' id='question'>{data?.results[0].question} </h2>
-               <ul className='.quiz-options'>
-                 <li>{data?.results[0].incorrect_answers}</li>
-                 <li>{data?.results[0].correct_answer}</li>
-                 <li>{data?.results[1].incorrect_answers}</li>
-                 <li>{data?.results[2].incorrect_answers}</li>
-               </ul>
-             <div id = "result"></div>
-      </div>
-      <div class = "quiz-foot">
-            <button type = "button" id = "check-answer">Check Answer</button>
-             <button type = "button" id = "play-again">Play Again!</button>
-      </div>
-      <button  className='next' onClick={refetch}>Next Question </button>
+
+  const handleAnswer = (answer) => {
+    if(!showAnswers){
+      if(answer === questions[currentIndex].correct_answer){
+        setScore(score+1);
+      }
+    }
+    
+
+    setShowAnswers(true);
+    
+  }
+
+  const handleNextQuestion = () => {
+    setCurrentIndex(currentIndex+1);
+    setShowAnswers(false);
+  }
+
+
+  return ( questions.length > 0 ? (
+
+    <div className="container">
+      {currentIndex >= questions.length ? (
+      <h1>Game Ended, Your Score is {score}</h1>): (<Questionaire   handleAnswer={handleAnswer}
+        showAnswers={showAnswers}
+        handleNextQuestion={handleNextQuestion}
+        data={questions[currentIndex]}/>)}
+      
     </div>
-</div>
+
+  ) : <div className="container">Loading...</div>
+    
   );
 }
 
 export default App;
+
+
+ /* random user :https://randomuser.me/api/?gender=female */
