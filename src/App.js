@@ -55,12 +55,9 @@ function App() {
       
     </div>
 
-  ) : <div className="container">Loading...</div>
+  ) : <div className="container" id = 'loading'> <h1>Loading...</h1></div>
     
   );
 }
 
 export default App;
-
-
- /* random user :https://randomuser.me/api/?gender=female */
